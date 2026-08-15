@@ -7,7 +7,8 @@ struct LiveActivityView: View {
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.isWatchOS) var isWatchOS
 
-    var context: ActivityViewContext<LiveActivityAttributes>
+    var context: LiveActivityViewContext
+    var isHomeWidget = false
 
     private var hasStaticColorScheme: Bool {
         context.state.glucoseColorScheme == "staticColor"
@@ -38,7 +39,7 @@ struct LiveActivityView: View {
                 LiveActivityChartView(context: context, additionalState: context.state.detailedViewState)
                     .frame(maxWidth: UIScreen.main.bounds.width * 0.9)
             }
-            .addLiveActivityModifiers(isWatchOS: true)
+            .addLiveActivityModifiers(isWatchOS: true, isHomeWidget: isHomeWidget)
 
         } else if isWatchOS {
             HStack {
@@ -55,7 +56,7 @@ struct LiveActivityView: View {
                     LiveActivityUpdatedLabelView(context: context, isDetailedLayout: false)
                 }
             }
-            .addLiveActivityModifiers(isWatchOS: true)
+            .addLiveActivityModifiers(isWatchOS: true, isHomeWidget: isHomeWidget)
 
         } else if context.state.useDetailedViewIOS {
             VStack {
@@ -149,7 +150,7 @@ struct LiveActivityView: View {
                     }
                 }
             }
-            .addLiveActivityModifiers(isWatchOS: false)
+            .addLiveActivityModifiers(isWatchOS: false, isHomeWidget: isHomeWidget)
         } else {
             Group {
                 if context.state.isInitialState {
@@ -170,14 +171,14 @@ struct LiveActivityView: View {
                     }
                 }
             }
-            .addLiveActivityModifiers(isWatchOS: false)
+            .addLiveActivityModifiers(isWatchOS: false, isHomeWidget: isHomeWidget)
         }
     }
 }
 
 // Expanded, minimal, compact view components
 struct LiveActivityExpandedLeadingView: View {
-    var context: ActivityViewContext<LiveActivityAttributes>
+    var context: LiveActivityViewContext
     var glucoseColor: Color
 
     var body: some View {
@@ -187,7 +188,7 @@ struct LiveActivityExpandedLeadingView: View {
 }
 
 struct LiveActivityExpandedTrailingView: View {
-    var context: ActivityViewContext<LiveActivityAttributes>
+    var context: LiveActivityViewContext
     var glucoseColor: Color
 
     var body: some View {
@@ -197,7 +198,7 @@ struct LiveActivityExpandedTrailingView: View {
 }
 
 struct LiveActivityExpandedBottomView: View {
-    var context: ActivityViewContext<LiveActivityAttributes>
+    var context: LiveActivityViewContext
 
     var body: some View {
         if context.state.isInitialState {
@@ -210,7 +211,7 @@ struct LiveActivityExpandedBottomView: View {
 }
 
 struct LiveActivityExpandedCenterView: View {
-    var context: ActivityViewContext<LiveActivityAttributes>
+    var context: LiveActivityViewContext
 
     var body: some View {
         LiveActivityUpdatedLabelView(context: context, isDetailedLayout: false)
@@ -221,7 +222,7 @@ struct LiveActivityExpandedCenterView: View {
 }
 
 struct LiveActivityCompactLeadingView: View {
-    var context: ActivityViewContext<LiveActivityAttributes>
+    var context: LiveActivityViewContext
     var glucoseColor: Color
 
     var body: some View {
@@ -230,7 +231,7 @@ struct LiveActivityCompactLeadingView: View {
 }
 
 struct LiveActivityCompactTrailingView: View {
-    var context: ActivityViewContext<LiveActivityAttributes>
+    var context: LiveActivityViewContext
     var glucoseColor: Color
 
     var body: some View {
@@ -239,7 +240,7 @@ struct LiveActivityCompactTrailingView: View {
 }
 
 struct LiveActivityMinimalView: View {
-    var context: ActivityViewContext<LiveActivityAttributes>
+    var context: LiveActivityViewContext
     var glucoseColor: Color
 
     var body: some View {

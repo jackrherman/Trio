@@ -3,7 +3,7 @@ import SwiftUI
 import WidgetKit
 
 struct LiveActivityTotalDailyDoseView: View {
-    var context: ActivityViewContext<LiveActivityAttributes>
+    var context: LiveActivityViewContext
     var additionalState: LiveActivityAttributes.ContentAdditionalState
 
     private var bolusFormatter: NumberFormatter {

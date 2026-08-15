@@ -2,6 +2,9 @@ import ActivityKit
 import Foundation
 
 struct LiveActivityAttributes: ActivityAttributes {
+    static let homeWidgetKind = "TrioHomeWidget"
+    static let homeWidgetSnapshotKey = "TrioHomeWidget.ContentState"
+
     enum LiveActivityItem: String, Hashable, Codable, Equatable {
         case currentGlucoseLarge
         case currentGlucose
@@ -30,6 +33,10 @@ struct LiveActivityAttributes: ActivityAttributes {
 
         /// true for the first state that is set on the activity
         let isInitialState: Bool
+
+        var latestGlucoseDate: Date? {
+            detailedViewState.chart.first?.date ?? date
+        }
     }
 
     struct ContentAdditionalState: Codable, Hashable {

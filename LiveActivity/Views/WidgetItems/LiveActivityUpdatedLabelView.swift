@@ -5,7 +5,7 @@ import WidgetKit
 struct LiveActivityUpdatedLabelView: View {
     @Environment(\.isWatchOS) var isWatchOS
 
-    var context: ActivityViewContext<LiveActivityAttributes>
+    var context: LiveActivityViewContext
     var isDetailedLayout: Bool
 
     private var dateFormatter: DateFormatter {

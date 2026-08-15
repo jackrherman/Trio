@@ -18,7 +18,7 @@ struct LiveActivityChartView: View {
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.isWatchOS) var isWatchOS
 
-    var context: ActivityViewContext<LiveActivityAttributes>
+    var context: LiveActivityViewContext
     var additionalState: LiveActivityAttributes.ContentAdditionalState
 
     var body: some View {

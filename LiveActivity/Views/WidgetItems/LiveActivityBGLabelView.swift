@@ -3,7 +3,7 @@ import SwiftUI
 import WidgetKit
 
 struct LiveActivityBGLabelView: View {
-    var context: ActivityViewContext<LiveActivityAttributes>
+    var context: LiveActivityViewContext
     var additionalState: LiveActivityAttributes.ContentAdditionalState
 
     var body: some View {

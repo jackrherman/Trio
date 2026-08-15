@@ -9,7 +9,7 @@ import SwiftUI
 import WidgetKit
 
 struct LiveActivityGlucoseDeltaLabelView: View {
-    var context: ActivityViewContext<LiveActivityAttributes>
+    var context: LiveActivityViewContext
     var glucoseColor: Color
 
     var body: some View {

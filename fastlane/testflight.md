@@ -171,15 +171,14 @@ _Referring to the table below, tap on each **IDENTIFIER** that has a different *
 
 > This step is required for first-time builders using GitHub Actions (Browser Build).
 
-> If you previously built using a Mac with Xcode you can skip ahead to [Create Trio App in App Store Connect](#create-trio-app-in-app-store-connect).
-
 > If you have previously built Trio as a beta tester (between May 13th, 2024, and today), you will already have an app group (`Loop App Group`) created and configured for your bundle identifiers. In this case, please *do not* skip this section; you are required to create the `Trio App Group` and configure it for your identifiers, as described below.
 
 > While you have the `Trio` identifier open in the steps below, you also need to enable the **Time Sensitive Notifications** capability before saving it - see [Enable Time Sensitive Notifications](#enable-time-sensitive-notifications) below.
 
 1. Go to [Certificates, Identifiers & Profiles](https://developer.apple.com/account/resources/identifiers/list) on the Apple developer site.
-1. Repeat this step for these three Identifier **NAMES** - refer to the [Table](#table-of-identifiers) above if your Names look different; if they do, see [Optional: Identifier Description Modification](#optional-identifier-description-modification)
+1. Repeat this step for these four Identifier **NAMES** - refer to the [Table](#table-of-identifiers) above if your Names look different; if they do, see [Optional: Identifier Description Modification](#optional-identifier-description-modification)
     * Trio
+    * Trio LiveActivity
     * Trio Watch App
     * Trio Watch Complication
 1. Click on the **IDENTIFIER** row.
@@ -188,11 +187,9 @@ _Referring to the table below, tap on each **IDENTIFIER** that has a different *
 1. Click "Continue".
 1. Click "Save".
 1. Click "Confirm".
-1. Remember to do this for each of three identifiers listed under step 2.
+1. Remember to do this for each of four identifiers listed under step 2.
 
-There is an additional identifier, but it does not need the App Group added to it:
-
-* Trio LiveActivity
+After adding the App Group to an existing Trio LiveActivity identifier, run the **3. Create Certificates** workflow once with **Recreate provisioning profiles after changing capabilities** enabled.
 
 ## Enable Time Sensitive Notifications
 

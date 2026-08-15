@@ -5,7 +5,7 @@ import WidgetKit
 struct LiveActivity: Widget {
     var body: some WidgetConfiguration {
         let configuration = ActivityConfiguration(for: LiveActivityAttributes.self) { context in
-            LiveActivityView(context: context)
+            LiveActivityView(context: LiveActivityViewContext(context))
                 .addIsWatchOS()
         } dynamicIsland: { context in
             let hasStaticColorScheme = context.state.glucoseColorScheme == "staticColor"
@@ -32,35 +32,35 @@ struct LiveActivity: Widget {
             return DynamicIsland {
                 DynamicIslandExpandedRegion(.leading) {
                     LiveActivityExpandedLeadingView(
-                        context: context,
+                        context: LiveActivityViewContext(context),
                         glucoseColor: glucoseColor
                     )
                 }
                 DynamicIslandExpandedRegion(.trailing) {
                     LiveActivityExpandedTrailingView(
-                        context: context,
+                        context: LiveActivityViewContext(context),
                         glucoseColor: hasStaticColorScheme ? .primary : glucoseColor
                     )
                 }
                 DynamicIslandExpandedRegion(.bottom) {
-                    LiveActivityExpandedBottomView(context: context)
+                    LiveActivityExpandedBottomView(context: LiveActivityViewContext(context))
                 }
                 DynamicIslandExpandedRegion(.center) {
-                    LiveActivityExpandedCenterView(context: context)
+                    LiveActivityExpandedCenterView(context: LiveActivityViewContext(context))
                 }
             } compactLeading: {
                 LiveActivityCompactLeadingView(
-                    context: context,
+                    context: LiveActivityViewContext(context),
                     glucoseColor: glucoseColor
                 )
             } compactTrailing: {
                 LiveActivityCompactTrailingView(
-                    context: context,
+                    context: LiveActivityViewContext(context),
                     glucoseColor: hasStaticColorScheme ? .primary : glucoseColor
                 )
             } minimal: {
                 LiveActivityMinimalView(
-                    context: context,
+                    context: LiveActivityViewContext(context),
                     glucoseColor: glucoseColor
                 )
             }

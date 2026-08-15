@@ -2,7 +2,7 @@ import SwiftUI
 import WidgetKit
 
 struct LiveActivityBGLabelWatchView: View {
-    var context: ActivityViewContext<LiveActivityAttributes>
+    var context: LiveActivityViewContext
     var glucoseColor: Color
 
     private var dateFormatter: DateFormatter {

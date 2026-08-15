@@ -5,7 +5,7 @@ import WidgetKit
 struct LiveActivityBGLabelLargeView: View {
     @Environment(\.isWatchOS) var isWatchOS
 
-    var context: ActivityViewContext<LiveActivityAttributes>
+    var context: LiveActivityViewContext
     var glucoseColor: Color
 
     var body: some View {

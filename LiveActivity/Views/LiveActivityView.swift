@@ -247,12 +247,10 @@ struct LiveActivityMinimalView: View {
         let (label, characterCount) = bgAndTrend(context: context, size: .minimal, glucoseColor: glucoseColor)
         let adjustedLabel = label.padding(.leading, 5).padding(.trailing, 2)
 
-        if characterCount < 4 {
-            adjustedLabel.fontWidth(.condensed)
-        } else if characterCount < 5 {
-            adjustedLabel.fontWidth(.compressed)
+        if characterCount <= 4 {
+            adjustedLabel
         } else {
-            adjustedLabel.fontWidth(.compressed)
+            adjustedLabel.fontWidth(.condensed)
         }
     }
 }

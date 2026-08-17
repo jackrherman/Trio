@@ -638,6 +638,9 @@
 		CC76E9512BD4812E008BEB61 /* Forecast+helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC76E9502BD4812E008BEB61 /* Forecast+helper.swift */; };
 		CE1856F52ADC4858007E39C7 /* AddCarbPresetIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE1856F42ADC4858007E39C7 /* AddCarbPresetIntent.swift */; };
 		CE1856F72ADC4869007E39C7 /* CarbPresetIntentRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE1856F62ADC4869007E39C7 /* CarbPresetIntentRequest.swift */; };
+		A1A1A1A10000000000000101 /* AIMacrosDraft.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1A1A1A10000000000000001 /* AIMacrosDraft.swift */; };
+		A1A1A1A10000000000000102 /* SaveAIMacrosDraftIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1A1A1A10000000000000002 /* SaveAIMacrosDraftIntent.swift */; };
+		A1A1A1A10000000000000103 /* AIMacrosDraftStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1A1A1A10000000000000003 /* AIMacrosDraftStoreTests.swift */; };
 		CE1F6DD92BADF4620064EB8D /* PluginManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE1F6DD82BADF4620064EB8D /* PluginManagerTests.swift */; };
 		CE1F6DDB2BAE08B60064EB8D /* TidepoolManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE1F6DDA2BAE08B60064EB8D /* TidepoolManager.swift */; };
 		CD1235D000000000000000F4 /* TidepoolUploadSerializer.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD1235C000000000000000F3 /* TidepoolUploadSerializer.swift */; };
@@ -1677,6 +1680,9 @@
 		CC76E9502BD4812E008BEB61 /* Forecast+helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Forecast+helper.swift"; sourceTree = "<group>"; };
 		CE1856F42ADC4858007E39C7 /* AddCarbPresetIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddCarbPresetIntent.swift; sourceTree = "<group>"; };
 		CE1856F62ADC4869007E39C7 /* CarbPresetIntentRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarbPresetIntentRequest.swift; sourceTree = "<group>"; };
+		A1A1A1A10000000000000001 /* AIMacrosDraft.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIMacrosDraft.swift; sourceTree = "<group>"; };
+		A1A1A1A10000000000000002 /* SaveAIMacrosDraftIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveAIMacrosDraftIntent.swift; sourceTree = "<group>"; };
+		A1A1A1A10000000000000003 /* AIMacrosDraftStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIMacrosDraftStoreTests.swift; sourceTree = "<group>"; };
 		CE1F6DD82BADF4620064EB8D /* PluginManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginManagerTests.swift; sourceTree = "<group>"; };
 		CE1F6DDA2BAE08B60064EB8D /* TidepoolManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TidepoolManager.swift; sourceTree = "<group>"; };
 		CD1235C000000000000000F3 /* TidepoolUploadSerializer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TidepoolUploadSerializer.swift; sourceTree = "<group>"; };
@@ -3053,6 +3059,7 @@
 		38FCF3EE25E9028E0078B0D1 /* TrioTests */ = {
 			isa = PBXGroup;
 			children = (
+				A1A1A1A10000000000000003 /* AIMacrosDraftStoreTests.swift */,
 				DDDD0FFD2F4E231600F9C645 /* Mocks */,
 				DDDD0FFA2F4E22C000F9C645 /* GlucoseSmoothingTests.swift */,
 				DDDD0FFC2F4E22C000F9C645 /* GlucoseNativeConversionTests.swift */,
@@ -3885,6 +3892,8 @@
 		CE1856F32ADC4835007E39C7 /* Carbs */ = {
 			isa = PBXGroup;
 			children = (
+				A1A1A1A10000000000000001 /* AIMacrosDraft.swift */,
+				A1A1A1A10000000000000002 /* SaveAIMacrosDraftIntent.swift */,
 				CE1856F42ADC4858007E39C7 /* AddCarbPresetIntent.swift */,
 				CE1856F62ADC4869007E39C7 /* CarbPresetIntentRequest.swift */,
 			);
@@ -5005,6 +5014,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A1A1A1A10000000000000101 /* AIMacrosDraft.swift in Sources */,
+				A1A1A1A10000000000000102 /* SaveAIMacrosDraftIntent.swift in Sources */,
 				DD5DC9F12CF3D97C00AB8703 /* AdjustmentsStateModel+Overrides.swift in Sources */,
 				3811DE2325C9D48300A708ED /* MainDataFlow.swift in Sources */,
 				C2A0A42F2CE03131003B98E8 /* ConstantValues.swift in Sources */,
@@ -5742,6 +5753,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A1A1A1A10000000000000103 /* AIMacrosDraftStoreTests.swift in Sources */,
 				3B5CD2C92D4AECD500CE213C /* ProfileCarbsTests.swift in Sources */,
 				3BEDC9932EEB27B600AC6492 /* IobConsecutiveEventsTests.swift in Sources */,
 				3B1DB90F2E63C14C00BD814B /* DetermineBasalLowEventualGlucoseTests.swift in Sources */,

@@ -11,6 +11,8 @@ struct MealPresetView: View {
     @Environment(AppState.self) var appState
 
     @State private var showAlert = false
+    @State private var aiMacrosDraft: AIMacrosDraft?
+    @State private var showAIMacrosReplacementConfirmation = false
     @State private var dish: String = ""
     @State private var showAddNewPresetSheet = false
 
@@ -54,6 +56,7 @@ struct MealPresetView: View {
     var body: some View {
         NavigationStack {
             Form {
+                aiMacrosPreset
                 mealPresets
                 dishInfos()
                 addPresetToTreatmentsButton
@@ -98,7 +101,112 @@ struct MealPresetView: View {
             .onDisappear {
                 resetValues()
             }
+            .onAppear {
+                refreshAIMacrosDraft()
+            }
         }
+    }
+
+    @ViewBuilder private var aiMacrosPreset: some View {
+        if let draft = aiMacrosDraft {
+            Section {
+                Button {
+                    if hasExistingTreatmentValues {
+                        showAIMacrosReplacementConfirmation = true
+                    } else {
+                        applyAIMacrosDraft(draft)
+                    }
+                } label: {
+                    VStack(alignment: .leading, spacing: 6) {
+                        HStack {
+                            Label("AI Macros — latest estimate", systemImage: "camera.viewfinder")
+                                .font(.headline)
+                            Spacer()
+                            Text(draft.createdAt, format: .relative(presentation: .named))
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                        }
+
+                        Text("AI estimate — review before saving")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+
+                        Text(aiMacrosMacroSummary(draft))
+                            .font(.subheadline)
+
+                        if !state.useFPUconversion {
+                            Text("FPU conversion is off: only carbs will be filled. Fat and protein will not be applied.")
+                                .font(.footnote)
+                                .foregroundStyle(.orange)
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .buttonStyle(.plain)
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel(
+                    "AI Macros latest estimate, \(aiMacrosMacroSummary(draft)). Estimated \(draft.createdAt.formatted(.relative(presentation: .named)))."
+                )
+                .accessibilityHint(
+                    state.useFPUconversion
+                        ? "Fills the treatment entry. Review the values before saving."
+                        : "Fills carbs only because FPU conversion is off. Review the values before saving."
+                )
+            } header: {
+                Text("Live preset")
+            }
+            .listRowBackground(Color.chart)
+            .confirmationDialog(
+                "Replace current treatment values?",
+                isPresented: $showAIMacrosReplacementConfirmation,
+                titleVisibility: .visible,
+                presenting: draft
+            ) { currentDraft in
+                Button("Replace", role: .destructive) {
+                    applyAIMacrosDraft(currentDraft)
+                }
+                Button("Cancel", role: .cancel) {}
+            } message: { _ in
+                Text(
+                    state.useFPUconversion
+                        ? "Your current carbs, fat, and protein values will be replaced. Review the AI estimate before saving a treatment."
+                        : "Your current treatment values will be replaced. FPU conversion is off, so only carbs will be applied. Review the AI estimate before saving a treatment."
+                )
+            }
+        }
+    }
+
+    private var hasExistingTreatmentValues: Bool {
+        state.carbs != 0 || state.fat != 0 || state.protein != 0
+    }
+
+    private func refreshAIMacrosDraft() {
+        aiMacrosDraft = AIMacrosDraftStore.shared.latest()
+    }
+
+    private func applyAIMacrosDraft(_ draft: AIMacrosDraft) {
+        guard let currentDraft = AIMacrosDraftStore.shared.consume(id: draft.id) else {
+            refreshAIMacrosDraft()
+            return
+        }
+
+        state.carbs = Decimal(currentDraft.carbs)
+        if state.useFPUconversion {
+            state.fat = Decimal(currentDraft.fat)
+            state.protein = Decimal(currentDraft.protein)
+        } else {
+            state.fat = 0
+            state.protein = 0
+        }
+        if state.note.isEmpty {
+            state.note = "AI Macros estimate"
+        }
+        aiMacrosDraft = nil
+        dismiss()
+    }
+
+    private func aiMacrosMacroSummary(_ draft: AIMacrosDraft) -> String {
+        "\(draft.carbs) g carbs · \(draft.fat) g fat · \(draft.protein) g protein"
     }
 
     private var mealPresets: some View {

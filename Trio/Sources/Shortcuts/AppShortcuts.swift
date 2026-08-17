@@ -40,6 +40,15 @@ struct AppShortcuts: AppShortcutsProvider {
             systemImageName: "fork.knife"
         )
         AppShortcut(
+            intent: SaveAIMacrosDraftIntent(),
+            phrases: [
+                "Save AI Macros in \(.applicationName)",
+                "Save meal macros in \(.applicationName)"
+            ],
+            shortTitle: "Save AI Macros",
+            systemImageName: "camera.metering.center.weighted"
+        )
+        AppShortcut(
             intent: ApplyOverridePresetIntent(),
             phrases: [
                 "Activate \(.applicationName) override",

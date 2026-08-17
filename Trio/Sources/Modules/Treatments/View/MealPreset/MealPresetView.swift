@@ -8,6 +8,8 @@ struct MealPresetView: View {
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.dismiss) var dismiss
     @Environment(\.managedObjectContext) var moc
+    @Environment(\.openURL) var openURL
+    @Environment(\.scenePhase) var scenePhase
     @Environment(AppState.self) var appState
 
     @State private var showAlert = false
@@ -103,6 +105,11 @@ struct MealPresetView: View {
             }
             .onAppear {
                 refreshAIMacrosDraft()
+            }
+            .onChange(of: scenePhase) { _, newPhase in
+                if newPhase == .active {
+                    refreshAIMacrosDraft()
+                }
             }
         }
     }
@@ -211,6 +218,13 @@ struct MealPresetView: View {
 
     private var mealPresets: some View {
         Section {
+            Button {
+                openURL(URL(string: "shortcuts://run-shortcut?name=AI%20Macros")!)
+            } label: {
+                Label("Run AI Macros", systemImage: "camera.viewfinder")
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+
             HStack {
                 if state.selection != nil {
                     minusButton

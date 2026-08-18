@@ -111,6 +111,9 @@ struct MealPresetView: View {
                     refreshAIMacrosDraft()
                 }
             }
+            .task {
+                await watchForAIMacrosDraft()
+            }
         }
     }
 
@@ -189,6 +192,13 @@ struct MealPresetView: View {
 
     private func refreshAIMacrosDraft() {
         aiMacrosDraft = AIMacrosDraftStore.shared.latest()
+    }
+
+    private func watchForAIMacrosDraft() async {
+        while !Task.isCancelled {
+            refreshAIMacrosDraft()
+            try? await Task.sleep(nanoseconds: 1_000_000_000)
+        }
     }
 
     private func applyAIMacrosDraft(_ draft: AIMacrosDraft) {

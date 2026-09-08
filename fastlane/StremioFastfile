@@ -11,7 +11,6 @@ platform :ios do
     setup_ci if ENV["CI"]
     workspace = ENV.fetch("GITHUB_WORKSPACE")
     source_ipa = File.join(workspace, "Stremio.ipa")
-    resigned_ipa = File.join(workspace, "Stremio-resigned.ipa")
     testflight_ipa = File.join(workspace, "Stremio-TestFlight.ipa")
 
     api_key = app_store_connect_api_key(
@@ -72,7 +71,7 @@ platform :ios do
       bundle_version: build_number.to_s
     )
 
-    sh("mv", resigned_ipa, testflight_ipa)
+    sh("mv", source_ipa, testflight_ipa)
     UI.user_error!("Create the App Store Connect record for #{STREMIO_BUNDLE_ID}, then rerun this workflow") unless app
 
     upload_to_testflight(

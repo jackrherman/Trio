@@ -21,7 +21,7 @@ platform :ios do
       STREMIO_WIDGET_BUNDLE_ID => "Stremio JH Downloads Widget"
     }.each do |identifier, name|
       Spaceship::ConnectAPI::BundleId.find(identifier) ||
-        Spaceship::ConnectAPI::BundleId.create(identifier: identifier, name: name)
+        Spaceship::ConnectAPI::BundleId.create(identifier: identifier, name: name, platform: "IOS")
     end
 
     match(

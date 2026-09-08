@@ -78,8 +78,7 @@ platform :ios do
       api_key: api_key,
       app_identifier: STREMIO_BUNDLE_ID,
       ipa: testflight_ipa,
-      skip_waiting_for_build_processing: true,
-      changelog: "Official Stremio 2.0.7 build 22, re-signed for private testing"
+      skip_waiting_for_build_processing: true
     )
   end
 end

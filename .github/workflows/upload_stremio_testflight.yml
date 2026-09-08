@@ -1,0 +1,44 @@
+name: Upload Stremio to TestFlight
+
+on:
+  push:
+    branches: [automation/stremio-testflight]
+    paths:
+      - .github/workflows/upload_stremio_testflight.yml
+      - fastlane/Fastfile
+      - fastlane/StremioFastfile
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: stremio-testflight
+  cancel-in-progress: false
+
+jobs:
+  upload:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install Fastlane
+        run: bundle install
+
+      - name: Provision, sign, and upload Stremio
+        run: bundle exec fastlane ios stremio_testflight
+        env:
+          TEAMID: ${{ secrets.TEAMID }}
+          GH_PAT: ${{ secrets.GH_PAT }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          FASTLANE_KEY_ID: ${{ secrets.FASTLANE_KEY_ID }}
+          FASTLANE_ISSUER_ID: ${{ secrets.FASTLANE_ISSUER_ID }}
+          FASTLANE_KEY: ${{ secrets.FASTLANE_KEY }}
+
+      - name: Keep signed IPA for troubleshooting
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: Stremio-TestFlight
+          path: Stremio-TestFlight.ipa
+          if-no-files-found: ignore

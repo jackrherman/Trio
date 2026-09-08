@@ -1,0 +1,82 @@
+require "base64"
+require "digest"
+require "match"
+
+STREMIO_BUNDLE_ID = "uk.co.jackherman.stremio"
+STREMIO_WIDGET_BUNDLE_ID = "#{STREMIO_BUNDLE_ID}.downloads-widget"
+
+platform :ios do
+  desc "Re-sign the official Stremio IPA and upload it to TestFlight"
+  lane :stremio_testflight do
+    setup_ci if ENV["CI"]
+
+    api_key = app_store_connect_api_key(
+      key_id: ENV.fetch("FASTLANE_KEY_ID"),
+      issuer_id: ENV.fetch("FASTLANE_ISSUER_ID"),
+      key_content: ENV.fetch("FASTLANE_KEY")
+    )
+
+    {
+      STREMIO_BUNDLE_ID => "Stremio JH",
+      STREMIO_WIDGET_BUNDLE_ID => "Stremio JH Downloads Widget"
+    }.each do |identifier, name|
+      Spaceship::ConnectAPI::BundleId.find(identifier) ||
+        Spaceship::ConnectAPI::BundleId.create(identifier: identifier, name: name)
+    end
+
+    match(
+      type: "appstore",
+      readonly: false,
+      api_key: api_key,
+      app_identifier: [STREMIO_BUNDLE_ID, STREMIO_WIDGET_BUNDLE_ID],
+      git_basic_authorization: Base64.strict_encode64("#{ENV.fetch('GITHUB_REPOSITORY_OWNER')}:#{ENV.fetch('GH_PAT')}")
+    )
+
+    profile_path = lambda do |identifier|
+      ENV.fetch(Match::Utils.environment_variable_name_profile_path(
+        app_identifier: identifier,
+        type: "appstore",
+        platform: "ios"
+      ))
+    end
+    signing_identity = ENV.fetch(Match::Utils.environment_variable_name_certificate_name(
+      app_identifier: STREMIO_BUNDLE_ID,
+      type: "appstore",
+      platform: "ios"
+    ))
+
+    app = Spaceship::ConnectAPI::App.find(STREMIO_BUNDLE_ID)
+    build_number = app ? latest_testflight_build_number(
+      app_identifier: STREMIO_BUNDLE_ID,
+      api_key: api_key,
+      initial_build_number: 0
+    ) + 1 : 1
+
+    sh("curl", "-fL", "https://dl.strem.io/apple/2.0.7b22/ios/stremio_iOS.ipa", "-o", "Stremio.ipa")
+    expected_sha256 = "cddfe220ce1f0c3befaf29eff9d7c3fe9cdb737bbac4353468169ba0d28b2c0f"
+    UI.user_error!("Downloaded IPA checksum mismatch") unless Digest::SHA256.file("Stremio.ipa").hexdigest == expected_sha256
+
+    resign(
+      ipa: "Stremio.ipa",
+      signing_identity: signing_identity,
+      provisioning_profile: {
+        "com.stremio.pal" => profile_path.call(STREMIO_BUNDLE_ID),
+        "com.stremio.pal.downloads-widget" => profile_path.call(STREMIO_WIDGET_BUNDLE_ID)
+      },
+      bundle_id: STREMIO_BUNDLE_ID,
+      short_version: "2.0.7",
+      bundle_version: build_number.to_s
+    )
+
+    sh("mv", "Stremio-resigned.ipa", "Stremio-TestFlight.ipa")
+    UI.user_error!("Create the App Store Connect record for #{STREMIO_BUNDLE_ID}, then rerun this workflow") unless app
+
+    upload_to_testflight(
+      api_key: api_key,
+      app_identifier: STREMIO_BUNDLE_ID,
+      ipa: "Stremio-TestFlight.ipa",
+      skip_waiting_for_build_processing: true,
+      changelog: "Official Stremio 2.0.7 build 22, re-signed for private testing"
+    )
+  end
+end

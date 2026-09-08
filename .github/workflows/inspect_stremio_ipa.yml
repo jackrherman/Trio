@@ -1,0 +1,33 @@
+name: Inspect Stremio IPA
+
+on:
+  push:
+    branches: [automation/stremio-testflight]
+    paths: [.github/workflows/inspect_stremio_ipa.yml]
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: macos-26
+    steps:
+      - name: Download official unsigned IPA
+        run: |
+          curl -fL https://dl.strem.io/apple/2.0.7b22/ios/stremio_iOS.ipa -o Stremio.ipa
+          echo 'cddfe220ce1f0c3befaf29eff9d7c3fe9cdb737bbac4353468169ba0d28b2c0f  Stremio.ipa' | shasum -a 256 -c -
+          unzip -q Stremio.ipa
+
+      - name: Inspect bundle and signatures
+        run: |
+          plutil -p Payload/Stremio.app/Info.plist
+          codesign -dvvv --entitlements :- Payload/Stremio.app > main-entitlements.plist 2> main-codesign.txt || true
+          codesign -dvvv --entitlements :- Payload/Stremio.app/PlugIns/StremioDownloadsWidget.appex > widget-entitlements.plist 2> widget-codesign.txt || true
+          cat main-codesign.txt main-entitlements.plist widget-codesign.txt widget-entitlements.plist
+
+      - uses: actions/upload-artifact@v6
+        with:
+          name: stremio-signing-inspection
+          path: |
+            *-codesign.txt
+            *-entitlements.plist

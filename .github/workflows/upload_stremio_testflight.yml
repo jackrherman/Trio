@@ -1,6 +1,11 @@
 name: Upload Stremio to TestFlight
 
 on:
+  push:
+    branches: [automation/stremio-testflight]
+    paths:
+      - .github/workflows/upload_stremio_testflight.yml
+      - fastlane/StremioFastfile
   workflow_dispatch:
 
 permissions:

@@ -1,6 +1,8 @@
 require "base64"
 require "digest"
+require "fileutils"
 require "match"
+require "tmpdir"
 
 STREMIO_BUNDLE_ID = "uk.co.jackherman.stremio"
 STREMIO_WIDGET_BUNDLE_ID = "#{STREMIO_BUNDLE_ID}.downloads-widget"
@@ -59,6 +61,24 @@ platform :ios do
     expected_sha256 = "cddfe220ce1f0c3befaf29eff9d7c3fe9cdb737bbac4353468169ba0d28b2c0f"
     UI.user_error!("Downloaded IPA checksum mismatch") unless Digest::SHA256.file(source_ipa).hexdigest == expected_sha256
 
+    Dir.mktmpdir("stremio-package") do |package_dir|
+      sh("unzip", "-q", source_ipa, "-d", package_dir)
+      app_bundle = File.join(package_dir, "Payload", "Stremio.app")
+      sh("plutil", "-replace", "MinimumOSVersion", "-string", "15.0", File.join(app_bundle, "Info.plist"))
+      sh(
+        "xcrun", "swift-stdlib-tool", "--copy",
+        "--scan-executable", File.join(app_bundle, "Stremio"),
+        "--scan-folder", File.join(app_bundle, "Frameworks"),
+        "--scan-folder", File.join(app_bundle, "PlugIns"),
+        "--platform", "iphoneos",
+        "--destination", File.join(app_bundle, "Frameworks"),
+        "--unsigned-destination", File.join(package_dir, "SwiftSupport")
+      )
+      UI.user_error!("SwiftSupport was not generated") unless File.exist?(File.join(package_dir, "SwiftSupport", "iphoneos", "libswift_Concurrency.dylib"))
+      FileUtils.rm(source_ipa)
+      Dir.chdir(package_dir) { sh("zip", "-qry", source_ipa, ".") }
+    end
+
     resign(
       ipa: source_ipa,
       signing_identity: signing_identity,
@@ -72,6 +92,14 @@ platform :ios do
     )
 
     sh("mv", source_ipa, testflight_ipa)
+    Dir.mktmpdir("stremio-verify") do |verify_dir|
+      sh("unzip", "-q", testflight_ipa, "-d", verify_dir)
+      app_bundle = File.join(verify_dir, "Payload", "Stremio.app")
+      minimum_ios = sh("plutil", "-extract", "MinimumOSVersion", "raw", "-o", "-", File.join(app_bundle, "Info.plist")).strip
+      UI.user_error!("MinimumOSVersion is #{minimum_ios}, expected 15.0") unless minimum_ios == "15.0"
+      UI.user_error!("Signed IPA is missing SwiftSupport") unless File.exist?(File.join(verify_dir, "SwiftSupport", "iphoneos", "libswift_Concurrency.dylib"))
+      sh("codesign", "--verify", "--deep", "--strict", app_bundle)
+    end
     UI.user_error!("Create the App Store Connect record for #{STREMIO_BUNDLE_ID}, then rerun this workflow") unless app
 
     upload_to_testflight(

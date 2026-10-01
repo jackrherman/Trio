@@ -402,12 +402,14 @@ final class LiveActivityData: ObservableObject {
 @available(iOS 16.2, *) extension LiveActivityManager {
     @MainActor func pushCurrentContent() async {
         guard let glucose = data.glucoseFromPersistence, let bg = glucose.first else {
+            clearHomeWidgetSnapshot()
             debug(.default, "[LiveActivityManager] pushCurrentContent: no current glucose data available")
             return
         }
         let prevGlucose = data.glucoseFromPersistence?.dropFirst().first
 
         guard let determination = data.determination else {
+            clearHomeWidgetSnapshot()
             debug(.default, "[LiveActivityManager] pushCurrentContent: no determination available")
             return
         }
@@ -445,5 +447,15 @@ final class LiveActivityData: ObservableObject {
         } catch {
             debug(.default, "[LiveActivityManager] Failed to encode Home Screen widget snapshot: \(error)")
         }
+    }
+
+    private func clearHomeWidgetSnapshot() {
+        guard let suiteName = Bundle.main.appGroupSuiteName,
+              let sharedDefaults = UserDefaults(suiteName: suiteName),
+              sharedDefaults.object(forKey: LiveActivityAttributes.homeWidgetSnapshotKey) != nil
+        else { return }
+
+        sharedDefaults.removeObject(forKey: LiveActivityAttributes.homeWidgetSnapshotKey)
+        WidgetCenter.shared.reloadTimelines(ofKind: LiveActivityAttributes.homeWidgetKind)
     }
 }

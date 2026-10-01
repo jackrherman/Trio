@@ -4,6 +4,7 @@ import CoreData
 import Foundation
 import Swinject
 import UIKit
+import WidgetKit
 
 @available(iOS 16.2, *) private struct ActiveActivity {
     let activity: Activity<LiveActivityAttributes>
@@ -70,7 +71,6 @@ final class LiveActivityData: ObservableObject {
     private var currentActivity: ActiveActivity?
 
     private var data = LiveActivityData()
-
     /// A dispatch queue for handling Core Data change notifications.
     private let queue = DispatchQueue(label: "LiveActivityBridge.queue", qos: .userInitiated)
     private var coreDataPublisher: AnyPublisher<Set<NSManagedObjectID>, Never>?
@@ -402,12 +402,14 @@ final class LiveActivityData: ObservableObject {
 @available(iOS 16.2, *) extension LiveActivityManager {
     @MainActor func pushCurrentContent() async {
         guard let glucose = data.glucoseFromPersistence, let bg = glucose.first else {
+            clearHomeWidgetSnapshot()
             debug(.default, "[LiveActivityManager] pushCurrentContent: no current glucose data available")
             return
         }
         let prevGlucose = data.glucoseFromPersistence?.dropFirst().first
 
         guard let determination = data.determination else {
+            clearHomeWidgetSnapshot()
             debug(.default, "[LiveActivityManager] pushCurrentContent: no determination available")
             return
         }
@@ -425,6 +427,35 @@ final class LiveActivityData: ObservableObject {
             widgetItems: data.widgetItems
         )
 
+        publishHomeWidgetSnapshot(content)
         await pushUpdate(content)
+    }
+
+    private func publishHomeWidgetSnapshot(_ content: LiveActivityAttributes.ContentState) {
+        guard let suiteName = Bundle.main.appGroupSuiteName,
+              let sharedDefaults = UserDefaults(suiteName: suiteName)
+        else { return }
+
+        do {
+            let encoder = JSONEncoder()
+            encoder.outputFormatting = .sortedKeys
+            let snapshot = try encoder.encode(content)
+            guard sharedDefaults.data(forKey: LiveActivityAttributes.homeWidgetSnapshotKey) != snapshot else { return }
+
+            sharedDefaults.set(snapshot, forKey: LiveActivityAttributes.homeWidgetSnapshotKey)
+            WidgetCenter.shared.reloadTimelines(ofKind: LiveActivityAttributes.homeWidgetKind)
+        } catch {
+            debug(.default, "[LiveActivityManager] Failed to encode Home Screen widget snapshot: \(error)")
+        }
+    }
+
+    private func clearHomeWidgetSnapshot() {
+        guard let suiteName = Bundle.main.appGroupSuiteName,
+              let sharedDefaults = UserDefaults(suiteName: suiteName),
+              sharedDefaults.object(forKey: LiveActivityAttributes.homeWidgetSnapshotKey) != nil
+        else { return }
+
+        sharedDefaults.removeObject(forKey: LiveActivityAttributes.homeWidgetSnapshotKey)
+        WidgetCenter.shared.reloadTimelines(ofKind: LiveActivityAttributes.homeWidgetKind)
     }
 }

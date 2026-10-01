@@ -9,7 +9,7 @@ import SwiftUI
 import WidgetKit
 
 struct LiveActivityBGAndTrendView: View {
-    var context: ActivityViewContext<LiveActivityAttributes>
+    var context: LiveActivityViewContext
     var size: Size
     var glucoseColor: Color
 

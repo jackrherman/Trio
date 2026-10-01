@@ -15,6 +15,21 @@ enum Size {
     case expanded
 }
 
+/// The state required by views shared between the Live Activity and Home Screen widget.
+struct LiveActivityViewContext {
+    let state: LiveActivityAttributes.ContentState
+    let isStale: Bool
+
+    init(state: LiveActivityAttributes.ContentState, isStale: Bool) {
+        self.state = state
+        self.isStale = isStale
+    }
+
+    init(_ context: ActivityViewContext<LiveActivityAttributes>) {
+        self.init(state: context.state, isStale: context.isStale)
+    }
+}
+
 enum GlucoseUnits: String, Equatable {
     case mgdL = "mg/dL"
     case mmolL = "mmol/L"
@@ -141,7 +156,7 @@ extension Color {
 }
 
 func bgAndTrend(
-    context: ActivityViewContext<LiveActivityAttributes>,
+    context: LiveActivityViewContext,
     size: Size,
     glucoseColor: Color
 ) -> (some View, Int) {
@@ -227,8 +242,16 @@ extension View {
         }
     }
 
-    @ViewBuilder func addLiveActivityModifiers(isWatchOS: Bool) -> some View {
-        modifier(LiveActivityModifiers(isWatchOS: isWatchOS))
+    @ViewBuilder func addLiveActivityModifiers(isWatchOS: Bool, isHomeWidget: Bool = false) -> some View {
+        if isHomeWidget {
+            padding(.all, 14)
+                .frame(minHeight: 0, maxHeight: .infinity)
+                .privacySensitive()
+                .foregroundStyle(Color.primary)
+                .containerBackground(BackgroundStyle.background.opacity(0.4), for: .widget)
+        } else {
+            modifier(LiveActivityModifiers(isWatchOS: isWatchOS))
+        }
     }
 }
 
